@@ -21,3 +21,8 @@ def test_OR論理演算子():
 def test_NOT論理演算子():
     expr = Not(("foo", "hoge"), ("bar", 123))
     assert expr.query() == "(not foo:'hoge' bar:123)"
+
+
+def test_論理演算子は入れ子にできる():
+    expr = And(("foo", "hoge"), Or(("bar", 123), Not(("baz", datetime(2013, 1, 23, 12, 34, 56)))))
+    assert expr.query() == "(and foo:'hoge' (or bar:123 (not baz:'2013-01-23T12:34:56')))"

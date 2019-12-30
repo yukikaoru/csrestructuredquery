@@ -48,7 +48,7 @@ class LogicalExpression(metaclass=abc.ABCMeta):
             if isinstance(expr, tuple):
                 q += f" {expr[0]}:{ExpressionValue(expr[1])}"
             else:
-                q += expr.query()
+                q += f" {expr.query()}"
         q += ")"
         return q
 
