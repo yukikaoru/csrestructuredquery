@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from csrestructuredquery.query import Query, And
+from csrestructuredquery.query import Query, And, Or
 
 
 def test_文字列型と日時型は引用符で括られる():
@@ -11,3 +11,8 @@ def test_文字列型と日時型は引用符で括られる():
 def test_AND論理演算子():
     expr = And(("foo", "hoge"), ("bar", 123))
     assert expr.query() == "(and foo:'hoge' bar:123)"
+
+
+def test_OR論理演算子():
+    expr = Or(("foo", "hoge"), ("bar", 123))
+    assert expr.query() == "(or foo:'hoge' bar:123)"

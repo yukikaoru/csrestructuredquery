@@ -55,3 +55,7 @@ class LogicalExpression(metaclass=abc.ABCMeta):
 
 class And(LogicalExpression):
     name = "and"
+
+
+class Or(LogicalExpression):
+    name = "or"
