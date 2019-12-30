@@ -59,3 +59,7 @@ class And(LogicalExpression):
 
 class Or(LogicalExpression):
     name = "or"
+
+
+class Not(LogicalExpression):
+    name = "not"
