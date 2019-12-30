@@ -1,5 +1,7 @@
-import typing
+from datetime import datetime
+from typing import Tuple, Union
 
-from csrestructuredquery.query import LogicalCondition
+from csrestructuredquery.query import LogicalExpression
 
-Condition = typing.Union[LogicalCondition]
+CsValue = Union[int, str, datetime]
+Expression = Union[LogicalExpression, Tuple]
