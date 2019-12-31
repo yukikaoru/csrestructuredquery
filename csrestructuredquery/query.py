@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import abc
+import dataclasses
 import typing
-from dataclasses import dataclass
 from datetime import datetime
 
 if typing.TYPE_CHECKING:
@@ -17,7 +17,7 @@ class Query:
         return And(*self.__expressions).query()
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class ExpressionValue:
     value: CsValue
 
@@ -72,3 +72,36 @@ class Not(LogicalExpression):
     @property
     def name(self) -> str:
         return "not"
+
+
+class SpecializedOperator(metaclass=abc.ABCMeta):
+    """専門演算子の基底クラス"""
+
+    @property
+    @abc.abstractmethod
+    def name(self) -> str:
+        pass
+
+    @abc.abstractmethod
+    def query(self) -> str:
+        pass
+
+
+@dataclasses.dataclass(frozen=True)
+class Near(SpecializedOperator):
+    field: str
+    value: CsValue
+    distance: int = dataclasses.field(default=0)
+    boost: int = dataclasses.field(default=0)
+
+    @property
+    def name(self) -> str:
+        return "near"
+
+    def query(self) -> str:
+        q = f"({self.name} field={self.field}"
+        if self.distance:
+            q += f" distance={self.distance}"
+        if self.boost:
+            q += f" boost={self.boost}"
+        return f"{q} {ExpressionValue(self.value)})"

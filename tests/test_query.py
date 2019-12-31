@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from csrestructuredquery.query import Query, And, Or, Not
+from csrestructuredquery.query import Query, And, Or, Not, Near
 
 
 def test_文字列型と日時型は引用符で括られる():
@@ -26,3 +26,10 @@ def test_NOT論理式():
 def test_論理式は入れ子にできる():
     expr = And(("foo", "hoge"), Or(("bar", 123), Not(("baz", datetime(2013, 1, 23, 12, 34, 56)))))
     assert expr.query() == "(and foo:'hoge' (or bar:123 (not baz:'2013-01-23T12:34:56')))"
+
+
+def test_near演算子():
+    operator = Near(field="foo", value="hoge")
+    assert operator.query() == "(near field=foo 'hoge')"
+    operator = Near(field="foo", value="hoge", distance=2, boost=4)
+    assert operator.query() == "(near field=foo distance=2 boost=4 'hoge')"
