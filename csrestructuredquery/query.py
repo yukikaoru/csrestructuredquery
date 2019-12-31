@@ -37,7 +37,10 @@ class ExpressionValue:
 class LogicalExpression(metaclass=abc.ABCMeta):
     """論理式の基底クラス"""
 
-    name: str
+    @property
+    @abc.abstractmethod
+    def name(self) -> str:
+        pass
 
     def __init__(self, *expressions: Expression):
         self.__expressions = expressions
@@ -54,12 +57,18 @@ class LogicalExpression(metaclass=abc.ABCMeta):
 
 
 class And(LogicalExpression):
-    name = "and"
+    @property
+    def name(self) -> str:
+        return "and"
 
 
 class Or(LogicalExpression):
-    name = "or"
+    @property
+    def name(self) -> str:
+        return "or"
 
 
 class Not(LogicalExpression):
-    name = "not"
+    @property
+    def name(self) -> str:
+        return "not"
