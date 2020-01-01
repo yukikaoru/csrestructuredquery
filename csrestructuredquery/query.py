@@ -113,12 +113,43 @@ class Phrase(SpecializedOperator):
     value: CsValue
     boost: int = dataclasses.field(default=0)
 
+    @property
+    def name(self) -> str:
+        return "phrase"
+
+    def query(self) -> str:
+        q = f"({self.name} field={self.field}"
+        if self.boost:
+            q += f" boost={self.boost}"
+        return f"{q} {ExpressionValue(self.value)})"
+
 
 @dataclasses.dataclass(frozen=True)
 class Prefix(SpecializedOperator):
+    field: str
+    value: CsValue
+    boost: int = dataclasses.field(default=0)
+
     @property
     def name(self) -> str:
         return "prefix"
+
+    def query(self) -> str:
+        q = f"({self.name} field={self.field}"
+        if self.boost:
+            q += f" boost={self.boost}"
+        return f"{q} {ExpressionValue(self.value)})"
+
+
+@dataclasses.dataclass(frozen=True)
+class Term(SpecializedOperator):
+    field: str
+    value: CsValue
+    boost: int = dataclasses.field(default=0)
+
+    @property
+    def name(self) -> str:
+        return "term"
 
     def query(self) -> str:
         q = f"({self.name} field={self.field}"
