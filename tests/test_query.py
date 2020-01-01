@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from csrestructuredquery.query import Query, And, Or, Not, Near
+from csrestructuredquery.query import Query, And, Or, Not, Near, Phrase
 
 
 def test_文字列型と日時型は引用符で括られる():
@@ -33,3 +33,10 @@ def test_near演算子():
     assert operator.query() == "(near field=foo 'hoge')"
     operator = Near(field="foo", value="hoge", distance=2, boost=4)
     assert operator.query() == "(near field=foo distance=2 boost=4 'hoge')"
+
+
+def test_phrase演算子():
+    operator = Phrase(field="foo", value="hoge")
+    assert operator.query() == "(phrase field=foo 'hoge')"
+    operator = Phrase(field="foo", value="hoge", boost=4)
+    assert operator.query() == "(phrase field=foo boost=4 'hoge')"

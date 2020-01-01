@@ -105,3 +105,20 @@ class Near(SpecializedOperator):
         if self.boost:
             q += f" boost={self.boost}"
         return f"{q} {ExpressionValue(self.value)})"
+
+
+@dataclasses.dataclass(frozen=True)
+class Phrase(SpecializedOperator):
+    field: str
+    value: CsValue
+    boost: int = dataclasses.field(default=0)
+
+    @property
+    def name(self) -> str:
+        return "phrase"
+
+    def query(self) -> str:
+        q = f"({self.name} field={self.field}"
+        if self.boost:
+            q += f" boost={self.boost}"
+        return f"{q} {ExpressionValue(self.value)})"
