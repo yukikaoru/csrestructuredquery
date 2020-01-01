@@ -113,9 +113,12 @@ class Phrase(SpecializedOperator):
     value: CsValue
     boost: int = dataclasses.field(default=0)
 
+
+@dataclasses.dataclass(frozen=True)
+class Prefix(SpecializedOperator):
     @property
     def name(self) -> str:
-        return "phrase"
+        return "prefix"
 
     def query(self) -> str:
         q = f"({self.name} field={self.field}"

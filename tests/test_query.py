@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from csrestructuredquery.query import Query, And, Or, Not, Near, Phrase
+from csrestructuredquery.query import Query, And, Or, Not, Near, Phrase, Prefix
 
 
 def test_文字列型と日時型は引用符で括られる():
@@ -40,3 +40,10 @@ def test_phrase演算子():
     assert operator.query() == "(phrase field=foo 'hoge')"
     operator = Phrase(field="foo", value="hoge", boost=4)
     assert operator.query() == "(phrase field=foo boost=4 'hoge')"
+
+
+def test_prefix演算子():
+    operator = Prefix(field="foo", value="hoge")
+    assert operator.query() == "(prefix field=foo 'hoge')"
+    operator = Prefix(field="foo", value="hoge", boost=4)
+    assert operator.query() == "(prefix field=foo boost=4 'hoge')"
