@@ -22,9 +22,6 @@ class ExpressionValue:
     value: CsValue
 
     def __str__(self) -> str:
-        return format(self.value)
-
-    def __format__(self, format_spec) -> str:
         if self.value is None:
             return ""
         if isinstance(self.value, datetime):
@@ -32,6 +29,27 @@ class ExpressionValue:
         if isinstance(self.value, str):
             return f"'{self.value}'"
         return str(self.value)
+
+    def __format__(self, format_spec) -> str:
+        return str(self)
+
+    def __bool__(self):
+        return bool(str(self))
+
+    def __lt__(self, other):
+        if isinstance(other, self.__class__):
+            return str(self) < str(other)
+        raise TypeError
+
+    def __le__(self, other):
+        if isinstance(other, self.__class__):
+            return str(self) <= str(other)
+        raise TypeError
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return str(self) == str(other)
+        raise TypeError
 
 
 class LogicalExpression(metaclass=abc.ABCMeta):
@@ -156,3 +174,61 @@ class Term(SpecializedOperator):
         if self.boost:
             q += f" boost={self.boost}"
         return f"{q} {ExpressionValue(self.value)})"
+
+
+@dataclasses.dataclass(frozen=True)
+class Range(SpecializedOperator):
+    field: str
+    min: typing.Optional[CsValue] = dataclasses.field(default=None)
+    max: typing.Optional[CsValue] = dataclasses.field(default=None)
+    boost: int = dataclasses.field(default=0)
+    minbound: bool = dataclasses.field(default=True)
+    maxbound: bool = dataclasses.field(default=False)
+
+    def __post_init__(self):
+        spec = RangeValueSpecification(min_=self.min, max_=self.max)
+        if not spec.isvalidvalues():
+            raise RangeArgumentError
+        if not spec.isvalidrange():
+            raise InvalidRangeError(min_=self.min, max_=self.max)
+
+    @property
+    def name(self) -> str:
+        return "range"
+
+    def query(self) -> str:
+        q = f"({self.name} field={self.field}"
+        if self.boost:
+            q += f" boost={self.boost}"
+        min_ = ExpressionValue(self.min)
+        max_ = ExpressionValue(self.max)
+        q += (
+            " "
+            + ("[" if min_ and self.minbound else "{")
+            + f"{min_},{max_}"
+            + ("]" if max_ and self.maxbound else "}")
+            + ")"
+        )
+        return q
+
+
+class RangeValueSpecification:
+    def __init__(self, min_: CsValue, max_: CsValue):
+        self.min = ExpressionValue(min_)
+        self.max = ExpressionValue(max_)
+
+    def isvalidvalues(self) -> bool:
+        return bool(self.min or self.max)
+
+    def isvalidrange(self) -> bool:
+        return bool((self.max and self.min <= self.max) or (self.min and not self.max))
+
+
+class RangeArgumentError(Exception):
+    def __init__(self):
+        self.message = "Cannot be set to None or empty string to both"
+
+
+class InvalidRangeError(Exception):
+    def __init__(self, min_: CsValue, max_: CsValue):
+        self.message = f"Must be min less than max ({min_}, {max_})"

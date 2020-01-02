@@ -1,6 +1,20 @@
 from datetime import datetime
 
-from csrestructuredquery.query import Query, And, Or, Not, Near, Phrase, Prefix, Term
+import pytest
+
+from csrestructuredquery.query import (
+    Query,
+    And,
+    Or,
+    Not,
+    Near,
+    Phrase,
+    Prefix,
+    Term,
+    Range,
+    RangeArgumentError,
+    InvalidRangeError,
+)
 
 
 def test_文字列型と日時型は引用符で括られる():
@@ -54,3 +68,45 @@ def test_term演算子():
     assert operator.query() == "(term field=foo 'hoge')"
     operator = Term(field="foo", value="hoge", boost=4)
     assert operator.query() == "(term field=foo boost=4 'hoge')"
+
+
+def test_range演算子はデフォルトでmin以上max未満となる():
+    operator = Range(field="foo", min=12, max=34)
+    assert operator.query() == "(range field=foo [12,34})"
+    operator = Range(field="foo", min=12, max=34, boost=4)
+    assert operator.query() == "(range field=foo boost=4 [12,34})"
+
+
+def test_range演算子においてminはNoneを許容する():
+    operator = Range(field="foo", min=None, max=34)
+    assert operator.query() == "(range field=foo {,34})"
+    operator = Range(field="foo", max=34)
+    assert operator.query() == "(range field=foo {,34})"
+
+
+def test_range演算子においてmaxはNoneを許容する():
+    operator = Range(field="foo", min=12, max=None)
+    assert operator.query() == "(range field=foo [12,})"
+    operator = Range(field="foo", min=12)
+    assert operator.query() == "(range field=foo [12,})"
+
+
+def test_range演算子においてminとmaxの両方がNoneだった場合にRangeArgumentErrorが発生する():
+    with pytest.raises(RangeArgumentError):
+        Range(field="foo", min=None, max=None)
+
+
+def test_range演算子においてminがmaxより大きかった場合にInvalidRangeErrorが発生する():
+    with pytest.raises(InvalidRangeError):
+        Range(field="foo", min=34, max=12)
+
+
+def test_range演算子は比較演算子の境界を含むかどうかを選択可能():
+    operator = Range(field="foo", min=12, max=34, minbound=True, maxbound=True)
+    assert operator.query() == "(range field=foo [12,34])"
+    operator = Range(field="foo", min=12, max=34, minbound=False, maxbound=False)
+    assert operator.query() == "(range field=foo {12,34})"
+    operator = Range(field="foo", max=34, minbound=True)
+    assert operator.query() == "(range field=foo {,34})"
+    operator = Range(field="foo", min=12, maxbound=True)
+    assert operator.query() == "(range field=foo [12,})"
