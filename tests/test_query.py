@@ -110,3 +110,8 @@ def test_range演算子は比較演算子の境界を含むかどうかを選択
     assert operator.query() == "(range field=foo {,34})"
     operator = Range(field="foo", min=12, maxbound=True)
     assert operator.query() == "(range field=foo [12,})"
+
+
+def test_range演算子はNoneの指定のみを省略と見なす():
+    assert Range(field="foo", min=0, max=10).query() == "(range field=foo [0,10})"
+    assert Range(field="foo", min="", max="10").query() == "(range field=foo ['','10'})"
