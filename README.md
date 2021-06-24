@@ -3,9 +3,9 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## CI status
-![test](https://github.com/yukikaoru/csrestructuredquery/workflows/test/badge.svg)
-![code style](https://github.com/yukikaoru/csrestructuredquery/workflows/code%20lint/badge.svg)
-![code lint](https://github.com/yukikaoru/csrestructuredquery/workflows/code%20style/badge.svg)
+[![test](https://github.com/yukikaoru/csrestructuredquery/actions/workflows/test.yml/badge.svg)](https://github.com/yukikaoru/csrestructuredquery/actions/workflows/test.yml)
+[![code style](https://github.com/yukikaoru/csrestructuredquery/actions/workflows/codestyle.yml/badge.svg)](https://github.com/yukikaoru/csrestructuredquery/actions/workflows/codestyle.yml)
+[![code lint](https://github.com/yukikaoru/csrestructuredquery/actions/workflows/codelint.yml/badge.svg)](https://github.com/yukikaoru/csrestructuredquery/actions/workflows/codelint.yml)
 
 ## Install
 
