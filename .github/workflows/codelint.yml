@@ -1,4 +1,4 @@
-name: flake8
+name: code lint
 
 on:
   push:
